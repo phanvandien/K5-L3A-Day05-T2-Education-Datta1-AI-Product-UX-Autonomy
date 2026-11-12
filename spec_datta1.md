@@ -6,7 +6,7 @@ Thành phần nhóm: tên, mã học viên, link prototype, lựa chọn thật 
 | --- | --- | --- |
 | Phan Văn Diện | 2A202603653 | §1, §2, §6 |
 | Bùi Hữu Phúc | 2A202603572 | §3 |
-|  | \[điền\] | §4 |
+| Trần Thành Nam | 2A202603564 | §4 |
 | Nguyễn Văn Vinh | 2A202603672 | §5, demo |
 
 ## §1. Lát cắt & phạm vi
