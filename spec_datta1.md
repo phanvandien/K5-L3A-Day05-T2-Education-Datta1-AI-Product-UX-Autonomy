@@ -143,7 +143,7 @@ Nếu tool thất bại, không hiển thị "Đã chuyển". TA
 
 ### 4.1. Xếp mức cho bốn tool
 
-Đây là mức tự chủ chốt cho thiết kế. Mức áp dụng cho **hành động của tool**, không có nghĩa mọi câu AI tạo ra đều được gửi đi. Trước khi trả lời, hệ thống đối chiếu tài liệu buổi đã mở và trạng thái bài tập ở Dữ liệu B. Nếu không xác định được nguồn hoặc trạng thái, AI dừng hành động có nguy cơ làm lộ đáp án và nói rõ điều chưa biết.
+Bảng dưới đây ghi mức tự chủ được chọn cho từng tool: AI tự làm, cần người duyệt, hoặc không được làm. Mức áp dụng cho **hành động của tool**, không có nghĩa mọi câu AI tạo ra đều được gửi đi. Trước khi trả lời, hệ thống đối chiếu tài liệu buổi đã mở và trạng thái bài tập ở Dữ liệu B. Nếu không xác định được nguồn hoặc trạng thái, AI dừng hành động có nguy cơ làm lộ đáp án và nói rõ điều chưa biết.
 
 | Tool | Mức chốt | Sai thì ai chịu gì; đảo lại được không? | Nếu chờ người duyệt thì mất gì? Vì sao chọn mức này? | Phương án đã cân nhắc và loại |
 | --- | --- | --- | --- | --- |
