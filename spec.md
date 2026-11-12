@@ -124,7 +124,7 @@
 - **G2 (làm rõ hệ thống làm tốt đến đâu)** → nhãn nguồn trên mỗi câu trả lời, ba trạng thái: "Có trong tài liệu §…" / "Tài liệu và phép kiểm không khớp" / "Tài liệu không có". K1 dùng trạng thái thứ hai.
 - **G11 (giải thích vì sao)** → khung trích nguyên văn kèm mã mục ở K1 và K2; ở K2 có thêm câu giải thích vì sao không xác nhận.
 - **G10 (thu hẹp phạm vi khi nghi ngờ)** → K2: bài đang mở thì thu về "gợi ý bước đầu"; K1: tách "phần mình chắc" khỏi "phần đừng dùng".
-- **G9 (sửa dễ dàng)** → nút "Rút câu hỏi" trên thẻ "Đã gửi TA" ở K1, và nút "Sai chỗ nào?" dưới mỗi câu trả lời.
+- **G9 (sửa dễ dàng)** → nút "Rút câu hỏi" trên thẻ "Đã gửi TA" ở K1, và nút "Sai chỗ nào?" dưới mỗi câu trả lời. Mỗi loại góp ý có một đường đi tiếp chứ không chỉ "đã ghi nhận": "Trích sai mục" → AI đưa các mục §3.1–§3.4 để chọn lại; "Không đúng câu em hỏi" → AI hỏi lại một câu; "Em nghĩ AI sai" → AI không tự sửa khi chưa có căn cứ, gửi câu trả lời kèm góp ý cho TA (có nút rút).
 - **PAIR · Explainability + Trust** → phản ví dụ 0,25 → 0,5 ở K1: học viên tự kiểm, không phải tin AI hay tin tài liệu.
 
 ### Lỗi sửa câu chữ không cứu được
@@ -192,6 +192,7 @@ A, B, C chính là ba mức gốc của đề (cấm / tự làm / cần ngườ
 - **Phần mock:** toàn bộ câu trả lời của AI là dựng sẵn, chọn theo từ khoá trong tin nhắn; dữ liệu khoá học là dữ liệu dựng của track; mọi mốc giờ (22:30 phía học viên, 08:05 phía TA) là cố định; không có backend, tải lại trang là mất trạng thái. Cờ "đang kiểm" ở §3.3 chỉ thấy được qua một học viên; prototype không có màn hình của học viên thứ hai.
 - **Hai màn hình (hai tab):** (A) khung chat của học viên; (B) hàng chờ của TA. Hai tab dùng chung trạng thái: học viên rút câu hỏi thì hàng chờ TA mất thẻ đó; TA xử lý cờ thì học viên nhận thông báo.
 - **Đường bấm ca khó:** bấm tin mồi K1 → "Thử phản ví dụ" → "Rút câu hỏi" → "Gửi lại" → bấm tin mồi K2 → "Luyện với Bài tập 2" → "Hỏi TA" → sang tab TA → nút "Đăng cho cả lớp" bị khoá cho tới khi xử lý cờ §3.3 → "Tài liệu sai, sửa nguồn" → "Đăng cho cả lớp".
+- **Đường học viên sửa AI:** "Sai chỗ nào?" dưới mỗi câu trả lời → chọn một trong ba loại góp ý → AI phản hồi theo loại (chọn lại mục / hỏi lại / gửi TA kiểm).
 - **Ca lạ:** ô nhập tự do. Ngoài K1, K2, prototype có sẵn đường cho K3, K4, K5, K6, K7, K8, K10, K11, K12 (bảng ở §7). Tin không khớp đường nào thì ra "Tài liệu không có" kèm nút "Hỏi TA"; prototype không đoán.
 - **Ảnh đánh số** (chụp với ô "Hiện số chú thích" bật; mở `index.html?shot=student` hoặc `?shot=ta` để dựng lại đúng trạng thái trong ảnh):
 
@@ -205,7 +206,7 @@ A, B, C chính là ba mức gốc của đề (cấm / tự làm / cần ngườ
 
 | Số | Chỗ trên màn hình | Thể hiện gì | Nguyên tắc | Mức tự chủ |
 |---|---|---|---|---|
-| ① | Khung xanh trên đầu khung chat (A): "Bạn đang chat với trợ lý AI. Mình chỉ dùng tài liệu buổi 1–3… đáp số thì không ai đưa, kể cả mình" | Phạm vi và lời hứa; cho biết đang nói chuyện với AI | G1 | — |
+| ① | Khung xanh trên đầu khung chat (A): "Bạn đang chat với trợ lý AI. Mình chỉ dùng tài liệu buổi 1–3 và trang khoá học, luôn ghi rõ mục. Bài đang mở: chỉ gợi ý bước đầu, đáp số thì không ai đưa, kể cả mình." | Phạm vi và lời hứa; cho biết đang nói chuyện với AI | G1 | — |
 | ② | Nhãn nguồn trên mỗi câu trả lời (A), ba trạng thái | Độ chắc | G2 | — |
 | ③ | Khung trích §3.3 có câu được tô nền (A) | Bằng chứng AI dựa vào | G11 | `tra_cuu_tai_lieu` tự làm |
 | ④ | Nút "Thử phản ví dụ" (A) | Học viên tự kiểm | PAIR Explainability + Trust | — |

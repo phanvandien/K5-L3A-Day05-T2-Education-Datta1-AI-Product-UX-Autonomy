@@ -6,83 +6,98 @@
 <title>Trợ lý học bài — prototype T2</title>
 <style>
   :root {
-    --bg: #f4f5f7; --panel: #ffffff; --ink: #1c2330; --muted: #667085; --line: #dfe3ea;
-    --brand: #2f5bd3; --brand-soft: #e8eefc;
-    --ok: #1d7a4c; --ok-soft: #e4f4ec;
-    --warn: #9a5b00; --warn-soft: #fff1d6; --warn-mark: #ffe08a;
-    --none: #5b6472; --none-soft: #eceef2;
-    --lock: #8a2f2f; --lock-soft: #fbeaea;
-    --sys: #f0f3f9;
+    --bg: #ffffff; --panel: #ffffff; --ink: #1d2433; --muted: #6b7280; --line: #e3e6ec;
+    --brand: #3b4cca; --brand-soft: #eceefb; --brand-line: #cdd2f4;
+    --ok: #17694a; --ok-soft: #e3f3ea;
+    --warn: #8a5300; --warn-soft: #fdefd2; --warn-mark: #ffdf8a;
+    --none: #555e6c; --none-soft: #eef0f3;
+    --lock: #8c3030; --lock-soft: #f9e9e6;
+    --sys: #f5f6f8;
+    --shadow: 0 1px 2px rgba(29, 36, 51, .06);
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, "Segoe UI", Roboto, sans-serif; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
   button { font: inherit; cursor: pointer; }
-  .top { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5; }
-  .top h1 { font-size: 15px; margin: 0; flex: 1 1 200px; }
-  .tabs { display: flex; gap: 4px; }
-  .tab { border: 1px solid var(--line); background: var(--panel); padding: 6px 12px; border-radius: 6px; color: var(--muted); }
-  .tab.on { background: var(--brand); border-color: var(--brand); color: #fff; }
-  .tab .count { background: #fff; color: var(--brand); border-radius: 10px; padding: 0 6px; margin-left: 6px; font-size: 12px; font-weight: 600; }
-  .toggle { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
-  .wrap { max-width: 760px; margin: 0 auto; padding: 16px; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+  .top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 8px 16px; background: rgba(255, 255, 255, .92); backdrop-filter: blur(6px); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5; }
+  .top h1 { font-size: 14px; font-weight: 600; margin: 0; flex: 1 1 200px; letter-spacing: -.01em; }
+  .tabs { display: flex; padding: 3px; background: var(--none-soft); border-radius: 9px; }
+  .tab { border: 0; background: transparent; padding: 5px 12px; border-radius: 7px; color: var(--muted); font-size: 13px; font-weight: 500; }
+  .tab.on { background: var(--panel); color: var(--ink); box-shadow: var(--shadow); }
+  .tab .count { background: var(--brand); color: #fff; border-radius: 9px; padding: 0 6px; margin-left: 5px; font-size: 11px; font-weight: 600; }
+  .toggle { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+  .wrap { max-width: 660px; margin: 0 auto; padding: 14px 16px 24px; }
   .screen { display: none; }
   .screen.on { display: block; }
 
-  .scope { background: var(--brand-soft); border: 1px solid #c9d6f7; border-radius: 8px; padding: 10px 12px; font-size: 14px; margin-bottom: 12px; }
+  .scope { background: var(--brand-soft); border: 1px solid var(--brand-line); border-radius: 10px; padding: 8px 12px; font-size: 13px; line-height: 1.45; margin-bottom: 6px; color: #2b3371; }
   .scope b { color: var(--brand); }
-  .clock { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+  .clock { font-size: 12px; color: var(--muted); margin: 0 2px 12px; }
 
-  .chat { display: flex; flex-direction: column; gap: 12px; min-height: 200px; }
-  .msg { max-width: 92%; }
-  .msg.user { align-self: flex-end; background: var(--brand); color: #fff; padding: 8px 12px; border-radius: 12px 12px 2px 12px; }
-  .msg.ai { align-self: flex-start; background: var(--panel); border: 1px solid var(--line); border-radius: 2px 12px 12px 12px; padding: 12px; width: 92%; }
-  .msg.ai p { margin: 0 0 8px; }
+  .chat { display: flex; flex-direction: column; gap: 8px; min-height: 160px; }
+  .msg { max-width: 88%; }
+  .msg.user { align-self: flex-end; background: var(--ink); color: #fff; padding: 7px 12px; border-radius: 14px 14px 4px 14px; margin-top: 6px; }
+  .msg.ai { align-self: flex-start; width: 88%; background: var(--panel); border: 1px solid var(--line); border-radius: 4px 14px 14px 14px; padding: 10px 12px; box-shadow: var(--shadow); }
+  .msg.ai p { margin: 0 0 6px; }
   .msg.ai p:last-child { margin-bottom: 0; }
-  .msg.sys { align-self: flex-start; width: 92%; background: var(--sys); border: 1px dashed #b9c2d3; border-radius: 8px; padding: 10px 12px; font-size: 14px; }
-  .sys .who { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .msg.sys { align-self: flex-start; width: 88%; background: var(--sys); border: 1px solid var(--line); border-left: 3px solid var(--brand); border-radius: 0 10px 10px 0; padding: 8px 12px; font-size: 13px; }
+  .sys .who { font-size: 11px; color: var(--muted); font-weight: 600; margin-bottom: 1px; }
+  .sys .row { margin-top: 6px; }
 
-  .label { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px; margin-bottom: 8px; }
+  .label, .state { display: inline-flex; align-items: center; font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 999px; margin: 0 6px 6px 0; }
   .label.ok { background: var(--ok-soft); color: var(--ok); }
   .label.warn { background: var(--warn-soft); color: var(--warn); }
   .label.none { background: var(--none-soft); color: var(--none); }
-  .state { display: block; font-size: 13px; font-weight: 600; padding: 6px 10px; border-radius: 6px; margin-bottom: 8px; }
   .state.open { background: var(--lock-soft); color: var(--lock); }
   .state.closed { background: var(--ok-soft); color: var(--ok); }
 
-  blockquote { margin: 8px 0; padding: 8px 12px; border-left: 3px solid var(--brand); background: #f7f9fd; border-radius: 0 6px 6px 0; font-size: 14px; }
-  blockquote .src { display: block; font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 2px; }
-  mark { background: var(--warn-mark); padding: 0 2px; border-radius: 2px; }
-  .calc { background: #fffaf0; border: 1px solid #f0dcae; border-radius: 6px; padding: 8px 12px; font-size: 14px; margin: 8px 0; }
+  blockquote { margin: 6px 0; padding: 6px 10px; border-left: 3px solid var(--brand-line); background: #f7f8fa; border-radius: 0 8px 8px 0; font-size: 13px; }
+  blockquote .src { display: block; font-size: 11.5px; color: var(--muted); font-weight: 600; }
+  mark { background: var(--warn-mark); color: inherit; padding: 0 2px; border-radius: 3px; }
+  .calc { background: var(--warn-soft); border-radius: 8px; padding: 7px 10px; font-size: 13px; margin: 6px 0 0; color: #5e3a00; }
+  .split { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; margin: 6px 0; font-size: 13px; }
+  .split dt { font-weight: 600; white-space: nowrap; }
+  .split dt.y { color: var(--ok); }
+  .split dt.x { color: var(--lock); }
+  .split dd { margin: 0; }
 
-  .row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-  .btn { border: 1px solid var(--line); background: var(--panel); padding: 6px 12px; border-radius: 6px; color: var(--ink); }
-  .btn:hover { border-color: var(--brand); }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
+  .btn { border: 1px solid var(--line); background: var(--panel); padding: 4px 11px; border-radius: 8px; color: var(--ink); font-size: 13px; font-weight: 500; transition: border-color .12s, background .12s; }
+  .btn:hover { border-color: var(--brand); background: var(--brand-soft); }
   .btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
-  .btn.ghost { border-color: transparent; color: var(--muted); font-size: 13px; padding: 4px 6px; }
+  .btn.primary:hover { background: #3140b0; }
+  .btn.ghost { border-color: transparent; background: transparent; color: var(--muted); font-size: 12px; font-weight: 400; padding: 2px 4px; text-decoration: underline; text-underline-offset: 2px; }
   .btn.danger { color: var(--lock); }
   .btn[disabled] { opacity: .45; cursor: not-allowed; }
-  .locked { margin-top: 10px; font-size: 13px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 8px; }
+  .row:has(> .ghost) { justify-content: flex-end; margin-top: 2px; }
+  .locked { margin-top: 8px; font-size: 12px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 6px; }
 
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 8px; }
-  .chip { border: 1px solid #c9d6f7; background: var(--brand-soft); color: var(--brand); padding: 6px 10px; border-radius: 999px; font-size: 13.5px; text-align: left; }
-  .composer { display: flex; gap: 8px; }
-  .composer input { flex: 1; min-width: 0; padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; font: inherit; }
-  .hint { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 8px; }
+  .chip { border: 1px solid var(--line); background: var(--panel); color: var(--ink); padding: 4px 10px; border-radius: 999px; font-size: 12.5px; text-align: left; }
+  .chip:hover { border-color: var(--brand); color: var(--brand); }
+  .composer { display: flex; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 5px; box-shadow: var(--shadow); }
+  .composer input { flex: 1; min-width: 0; padding: 6px 8px; border: 0; background: transparent; font: inherit; }
+  .composer input:focus-visible { outline: none; }
+  .composer:focus-within { border-color: var(--brand); }
+  .hint { font-size: 11.5px; color: var(--muted); margin: 6px 2px 0; }
 
-  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; margin-bottom: 12px; }
-  .card h3 { margin: 0 0 4px; font-size: 15px; }
-  .card .meta { font-size: 12.5px; color: var(--muted); margin-bottom: 8px; }
-  .note { font-size: 13px; padding: 6px 10px; border-radius: 6px; background: var(--warn-soft); color: var(--warn); margin: 8px 0; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; box-shadow: var(--shadow); }
+  .card h3 { margin: 0 0 2px; font-size: 14px; font-weight: 600; }
+  .card p { margin: 6px 0; }
+  .card .meta { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .note { font-size: 12.5px; padding: 6px 10px; border-radius: 8px; background: var(--warn-soft); color: var(--warn); margin: 8px 0; }
   .note.done { background: var(--ok-soft); color: var(--ok); }
   .empty { color: var(--muted); text-align: center; padding: 32px 0; }
-  textarea { width: 100%; min-height: 90px; font: inherit; padding: 8px; border: 1px solid var(--line); border-radius: 6px; }
+  textarea { width: 100%; min-height: 84px; font: inherit; padding: 8px; border: 1px solid var(--line); border-radius: 8px; }
 
-  .n { display: none; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: #d1242f; color: #fff; font-size: 12px; font-weight: 700; margin-right: 6px; vertical-align: middle; flex: none; }
+  .n { display: none; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: #d1242f; color: #fff; font-size: 11px; font-weight: 700; margin-right: 5px; vertical-align: middle; flex: none; }
   body.nums .n { display: inline-flex; }
-  .legend { display: none; font-size: 13px; }
+  .legend { display: none; font-size: 12.5px; }
   body.nums .legend { display: block; }
   .legend table { border-collapse: collapse; width: 100%; }
   .legend td { border-top: 1px solid var(--line); padding: 4px 6px; vertical-align: top; }
+  @media (max-width: 520px) { .msg, .msg.ai, .msg.sys { max-width: 100%; width: 100%; } }
 </style>
 </head>
 <body>
@@ -100,7 +115,7 @@
 
   <!-- MÀN HÌNH A — HỌC VIÊN -->
   <section class="screen on" id="student">
-    <div class="scope"><span class="n">1</span><b>Bạn đang chat với trợ lý AI.</b> Mình chỉ dùng tài liệu buổi 1–3 và trang khoá học, và luôn ghi rõ mục nào. Với bài đang mở, mình chỉ gợi ý bước đầu: đáp số thì không ai đưa, kể cả mình. Tài liệu không có thì mình nói là không có.</div>
+    <div class="scope"><span class="n">1</span><b>Bạn đang chat với trợ lý AI.</b> Mình chỉ dùng tài liệu buổi 1–3 và trang khoá học, luôn ghi rõ mục. Bài đang mở: chỉ gợi ý bước đầu, đáp số thì không ai đưa, kể cả mình.</div>
     <div class="clock">Bây giờ: 22:30 · 12/11/2026 · Giờ TA: 08:00–22:00 (TA đang nghỉ)</div>
 
     <div class="chat" id="chat"></div>
@@ -178,7 +193,8 @@
       quote('Buổi 3 · §3.3 Phương sai và độ lệch chuẩn',
         'Độ lệch chuẩn là căn bậc hai của phương sai, có cùng đơn vị với dữ liệu. <mark>Vì là căn bậc hai, độ lệch chuẩn luôn nhỏ hơn phương sai.</mark>', 3) +
       '<p>Mình thấy câu được tô <b>cần xem lại</b>, vì nó không đúng với mọi bộ số.</p>' +
-      '<p><b>Phần mình chắc theo tài liệu:</b> độ lệch chuẩn là căn bậc hai của phương sai và có cùng đơn vị với dữ liệu.<br><b>Phần bạn đừng dùng</b> cho tới khi giảng viên xác nhận: "luôn nhỏ hơn".</p>' +
+      '<dl class="split"><dt class="y">Dùng được</dt><dd>Độ lệch chuẩn là căn bậc hai của phương sai, cùng đơn vị với dữ liệu.</dd>' +
+      '<dt class="x">Đừng dùng</dt><dd>"Luôn nhỏ hơn", cho tới khi giảng viên xác nhận.</dd></dl>' +
       '<div class="row"><button class="btn" data-act="counter">' + n(4) + 'Thử phản ví dụ</button></div>' +
       '<div class="calc" hidden>Phương sai = 0,25 → độ lệch chuẩn = √0,25 = <b>0,5</b>. Ở đây độ lệch chuẩn <b>lớn hơn</b> phương sai. Bạn gõ <code>=0,25^0,5</code> vào bảng tính để tự kiểm.</div>' +
       feedback);
@@ -420,9 +436,39 @@
       document.getElementById(a.id).innerHTML = askCard(a.id); sync();
     } else if (act === 'feedback') {
       b.closest('.row').outerHTML =
-        '<div class="row"><button class="btn" data-act="fb">Trích sai mục</button><button class="btn" data-act="fb">Không đúng câu em hỏi</button><button class="btn" data-act="fb">Em nghĩ AI sai</button></div>';
+        '<div class="row"><button class="btn" data-act="fb" data-kind="section">Trích sai mục</button><button class="btn" data-act="fb" data-kind="question">Không đúng câu em hỏi</button><button class="btn" data-act="fb" data-kind="wrong">Em nghĩ AI sai</button></div>';
     } else if (act === 'fb') {
-      b.closest('.row').outerHTML = '<div class="locked">Đã ghi nhận: "' + esc(b.textContent) + '". Góp ý này đi kèm câu trả lời khi TA xem.</div>';
+      var kind = b.dataset.kind;
+      b.closest('.row').outerHTML = '<div class="locked">Bạn báo: "' + esc(b.textContent) + '".</div>';
+      fbReply(kind);
+    }
+  }
+
+  // Học viên sửa AI: mỗi loại góp ý có một đường đi tiếp, không chỉ "đã ghi nhận"
+  function fbReply(kind) {
+    if (kind === 'section') {
+      add('ai',
+        label('none', 'Bạn chọn lại mục') +
+        '<p>Xin lỗi, mình trích chưa đúng mục bạn cần. Buổi 3 có các mục dưới đây, bạn chọn mục đúng nhé.</p>' +
+        '<div class="row">' +
+        '<button class="btn" data-say="Trung bình cộng là gì ạ?">§3.1 Trung bình cộng</button>' +
+        '<button class="btn" data-say="Trung vị là gì ạ?">§3.2 Trung vị</button>' +
+        '<button class="btn" data-say="Độ lệch chuẩn là gì ạ?">§3.3 Độ lệch chuẩn</button>' +
+        '<button class="btn" data-say="Giá trị ngoại lai là gì ạ?">§3.4 Ngoại lai</button>' +
+        '<button class="btn" data-act="askTA" data-q="Học viên báo trợ lý trích sai mục, không mục nào ở buổi 3 khớp">' + n(7) + 'Không có mục nào, hỏi TA</button></div>');
+    } else if (kind === 'question') {
+      add('ai',
+        label('none', 'Chưa đủ rõ để tra tài liệu') +
+        '<p>Mình hiểu chưa đúng câu hỏi của bạn. Bạn nói lại bằng một câu ngắn giúp mình: bạn đang kẹt ở khái niệm nào, hay ở bài tập nào?</p>');
+      document.getElementById('input').focus();
+    } else {
+      add('ai',
+        label('none', 'Cần người kiểm') +
+        '<p>Có thể mình sai. Mình không tự sửa câu trả lời khi chưa có căn cứ mới, nên mình gửi câu trả lời này kèm góp ý của bạn cho TA. Cho tới khi TA trả lời, bạn coi câu trả lời trên là chưa được xác nhận.</p>');
+      var id = 'ask' + (++seq);
+      S.asks.push({ id: id, text: 'Học viên cho rằng câu trả lời của trợ lý sai, cần TA xem lại', state: 'sent' });
+      add('sys', askCard(id)).id = id;
+      sync();
     }
   }
   function find(id) { return S.asks.filter(function (a) { return a.id === id; })[0]; }
