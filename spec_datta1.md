@@ -143,9 +143,9 @@ Nếu tool thất bại, không hiển thị "Đã chuyển". TA
 
 ### 4.1. Xếp mức cho bốn tool
 
-Mức dưới đây áp dụng cho **hành động của tool**, không có nghĩa mọi câu AI tạo ra đều được gửi đi. Trước khi trả lời, hệ thống đối chiếu tài liệu buổi đã mở và trạng thái bài tập ở Dữ liệu B. Nếu không xác định được nguồn hoặc trạng thái, AI dừng hành động có nguy cơ làm lộ đáp án và nói rõ điều chưa biết.
+Đây là mức tự chủ chốt cho thiết kế. Mức áp dụng cho **hành động của tool**, không có nghĩa mọi câu AI tạo ra đều được gửi đi. Trước khi trả lời, hệ thống đối chiếu tài liệu buổi đã mở và trạng thái bài tập ở Dữ liệu B. Nếu không xác định được nguồn hoặc trạng thái, AI dừng hành động có nguy cơ làm lộ đáp án và nói rõ điều chưa biết.
 
-| Tool | Mức của nhóm | Sai thì ai chịu gì; đảo lại được không? | Nếu chờ người duyệt thì mất gì? Vì sao chọn mức này? | Phương án đã cân nhắc và loại |
+| Tool | Mức chốt | Sai thì ai chịu gì; đảo lại được không? | Nếu chờ người duyệt thì mất gì? Vì sao chọn mức này? | Phương án đã cân nhắc và loại |
 | --- | --- | --- | --- | --- |
 | `tra_cuu_tai_lieu` | **Tự làm** | Tool chỉ đọc, nên bản thân việc tra cứu không sửa dữ liệu. Nhưng nếu AI coi đoạn tìm được là chân lý và lặp câu sai ở §3.3, học viên có thể học sai (K8); thu hồi câu đã đọc không bảo đảm sửa được niềm tin. | Bắt TA duyệt mọi lần tra cứu làm học viên hỏi bài tối muộn không nhận được nguồn kịp thời. Cho tra cứu ngay, chỉ trả mục có thật của buổi đã mở; không thấy thì nói không thấy. Đoạn có dấu hiệu mâu thuẫn như §3.3 phải gắn nhãn “Cần xem lại”, nêu lý do và mời báo TA, không khẳng định đúng. | Loại **cần TA duyệt mọi kết quả tra cứu** vì chờ quá đắt cho cả câu hỏi bình thường; loại **tự tin lặp nguyên văn mọi kết quả** vì K8 chứng minh trích đúng vẫn có thể sai. |
 | `goi_y_bai_tap` | **Tự làm, giới hạn theo trạng thái bài** | Nếu đưa, xác nhận hoặc phủ nhận đáp số Bài 3 đang mở, học viên có thể chép hoặc dò đáp án (K5, K6). Xóa gợi ý sau đó không thu hồi được thông tin đã đọc. | Bắt TA duyệt từng gợi ý khiến học viên hỏi sau 22:00 phải chờ đến ca 08:00, có thể mất thời gian làm bài trước hạn 13/11 23:59. Cho AI tự gửi **gợi ý phương pháp/bước đầu**, có §3.1–§3.2, nhưng chặn đáp số, đánh giá đúng/sai và lời giải hoàn chỉnh khi bài còn mở. Nếu chưa biết bài mở hay đã đóng, không gửi gợi ý về kết quả; hỏi lại hoặc chuyển TA. Bài 2 đã hết hạn và có đáp án công bố được giải thích đầy đủ (K10). | Loại **tự gửi mọi gợi ý** vì K6 cho thấy cả một chữ “đúng” cũng làm hỏng giới hạn; loại **TA duyệt mọi gợi ý** vì người học cần hỗ trợ ngoài giờ trực. |
@@ -158,16 +158,7 @@ Mức dưới đây áp dụng cho **hành động của tool**, không có ngh�
 
 Tool này có giá ở cả hai phía. **Cho tự làm không giới hạn** thì K6 có thể biến câu “đúng chưa?” thành một lần xác nhận đáp số; lời xin lỗi sau đó không cứu được. **Bắt TA duyệt mọi gợi ý** thì học viên hỏi tối muộn phải chờ hết giờ trực; ngay cả K10, bài đã có đáp án công bố, cũng bị chặn vô ích. **Cấm hẳn** thì sản phẩm không còn giúp học viên tự học từng bước.
 
-**Phương án nhóm dùng để hoàn thiện §4:** cho tự gửi gợi ý bước đầu khi biết chắc bài đang mở; từ chối đưa hoặc kiểm đáp số; với bài đã đóng và có đáp án công bố thì được giải thích đầy đủ. Nếu hệ thống không chặn được nội dung có đáp số/nhận xét đúng sai, nó không gửi gợi ý đó và mời học viên hỏi TA. Cách chốt này giữ hỗ trợ tức thì mà chặn lỗi đắt nhất ở K6.
-
-**Cần nhóm điền lựa chọn độc lập thực tế trước khi nộp** (không suy ra lựa chọn của người khác):
-
-| Người | Mức ban đầu cho `goi_y_bai_tap` | Lý do người đó đưa ra |
-| --- | --- | --- |
-| Phan Văn Diện | *Điền lựa chọn thật* | *Điền lý do thật* |
-| Bùi Hữu Phúc | *Điền lựa chọn thật* | *Điền lý do thật* |
-| Trần Thành Nam | *Điền lựa chọn thật* | *Điền lý do thật* |
-| Nguyễn Văn Vinh | *Điền lựa chọn thật* | *Điền lý do thật* |
+**Quyết định:** cho tự gửi gợi ý bước đầu khi biết chắc bài đang mở; từ chối đưa hoặc kiểm đáp số; với bài đã đóng và có đáp án công bố thì được giải thích đầy đủ. Nếu hệ thống không chặn được nội dung có đáp số/nhận xét đúng sai, nó không gửi gợi ý đó và mời học viên hỏi TA. Cách chốt này giữ hỗ trợ tức thì mà chặn lỗi đắt nhất ở K6. Khi trình bày, nhóm cần nói rõ đây là lựa chọn thiết kế sau khi cân ba mức trên; chưa có ghi nhận lựa chọn độc lập ban đầu của từng thành viên.
 
 ### 4.3. Thử mức trên hai ca đắt nhất và một ca bình thường ở §2
 
