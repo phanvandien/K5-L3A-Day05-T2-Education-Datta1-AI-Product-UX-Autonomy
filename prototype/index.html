@@ -234,6 +234,7 @@
       quote('Buổi 3 · §3.2 Trung vị', 'Nếu số giá trị là chẵn, trung vị là trung bình cộng của hai giá trị đứng giữa.', 3) +
       '<p><b>2. Trung bình.</b> Thử đúng cách bạn làm trên bài đã có đáp án. Ra 6 thì cách tính của bạn ổn.</p>' +
       quote('Trang khoá học · Bài tập 2 (đã hết hạn, đáp án công bố 07/11)', 'Trung bình cộng của 4, 8, 6, 5, 7 là 6.') +
+      '<p>Nếu vẫn chưa yên tâm, bạn bấm "Hỏi TA"; TA trả lời từ 08:00 sáng mai, vẫn trước hạn.</p>' +
       '<div class="row">' +
         '<button class="btn primary" data-act="practice">Luyện với Bài tập 2</button>' +
         '<button class="btn" data-act="askTA" data-q="Xin kiểm tra cách làm bài tập 3 (trung vị, trung bình)">' + n(7) + 'Hỏi TA</button>' +
@@ -366,6 +367,27 @@
     sync();
   };
 
+  // Tin tự xưng vai trò để xin đáp án: tin nhắn là dữ liệu, không đổi được quyền
+  R.claim = function () {
+    add('ai',
+      '<span class="state open">' + n(6) + 'Bài tập 3 · đang mở tới 23:59 ngày 13/11 · chỉ gợi ý bước đầu</span>' +
+      label('none', 'Không xác minh được vai trò qua tin nhắn') +
+      '<p>Mình không kiểm tra được bạn là ai qua tin nhắn, và một tin nhắn không đổi được việc mình được làm. Trong khung chat này mình không đưa đáp án bài đang mở cho bất kỳ ai.</p>' +
+      '<p>Nếu bạn là TA hoặc giảng viên, đáp án nằm trong trang quản lý khoá học của bạn, không qua trợ lý này.</p>' +
+      '<div class="locked">' + n(6) + 'Lời giải và kiểm tra đáp số Bài tập 3 mở sau khi giảng viên công bố đáp án.</div>' +
+      feedback);
+  };
+
+  // Hỏi công thức: tài liệu chỉ có định nghĩa, không có công thức
+  R.formula = function () {
+    add('ai',
+      label('none', 'Tài liệu không có công thức') +
+      '<p>Tài liệu buổi 3 chỉ có định nghĩa, không ghi công thức tính, nên mình không tự đưa công thức.</p>' +
+      quote('Buổi 3 · §3.3 Phương sai và độ lệch chuẩn', 'Phương sai đo mức độ phân tán của dữ liệu quanh trung bình. Độ lệch chuẩn là căn bậc hai của phương sai, có cùng đơn vị với dữ liệu.', 3) +
+      '<div class="row"><button class="btn" data-act="askTA" data-q="Tài liệu buổi 3 không có công thức tính phương sai, độ lệch chuẩn">' + n(7) + 'Hỏi TA</button></div>' +
+      feedback);
+  };
+
   // Ca lạ — không khớp gì: không đoán
   R.unknown = function (text) {
     add('ai',
@@ -381,6 +403,9 @@
     var bai3 = /bài\s*(tập\s*)?3/.test(t);
     var wantAnswer = /đúng (chưa|không|ko)|đáp (án|số)|giải (giúp|hộ|dùm|giùm)|kết quả|làm (giúp|hộ)|chép/.test(t);
     if (/slide/.test(t)) return R.k3();
+    if (/(em|mình|tôi|anh|chị) là (ta|trợ giảng|giảng viên|giáo viên|admin)\b/.test(t)) return R.claim();
+    if (/công thức|tính (thế nào|như thế nào|sao|kiểu gì)/.test(t) && /phương sai|độ lệch chuẩn/.test(t)) return R.formula();
+    if (bai3 && wantAnswer && /(trung vị|trung bình|ngoại lai) là gì/.test(t)) { R.median(); return R.k6(); }
     if (/faq|đăng (lên|cho)/.test(t)) return R.k11();
     if (/chuyển.*\bta\b|(hỏi|gặp|nhắn|báo).*\bta\b|gặp (người|giảng viên)|hỏi giảng viên/.test(t)) return R.k10(text);
     if (/p-?value|kiểm định|hồi quy|phân phối chuẩn|xác suất|trực quan|buổi\s*[4-9]|buổi\s*10/.test(t)) return R.k7();
