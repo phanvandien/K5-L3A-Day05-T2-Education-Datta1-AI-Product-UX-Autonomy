@@ -122,9 +122,9 @@
 
     <div class="chips" id="chips">
       <button class="chip" data-say="Độ lệch chuẩn với phương sai cái nào lớn hơn ạ?">Độ lệch chuẩn với phương sai cái nào lớn hơn ạ?</button>
-      <button class="chip" data-say="Em tính bài 3 ra trung vị 11,5, trung bình 15,25, đúng chưa ạ?">Em tính bài 3 ra trung vị 11,5, trung bình 15,25, đúng chưa ạ?</button>
+      <button class="chip" data-say="Bài 3 trung bình em ra 12, trung vị em ra 11,5, đúng chưa ạ?">Bài 3 trung bình em ra 12, trung vị em ra 11,5, đúng chưa ạ?</button>
       <button class="chip" data-say="Bài 2 sao đáp án lại là 6 ạ?">Bài 2 sao đáp án lại là 6 ạ?</button>
-      <button class="chip" data-say="Slide 12 nói gì về ngoại lai ạ?">Slide 12 nói gì về ngoại lai ạ?</button>
+      <button class="chip" data-say="Theo slide 12 thì trung vị tính sao ạ?">Theo slide 12 thì trung vị tính sao ạ?</button>
     </div>
     <form class="composer" id="composer">
       <input id="input" placeholder="Hoặc gõ câu hỏi bất kỳ (ca lạ)…" autocomplete="off">
@@ -146,9 +146,9 @@
       <tr><td>2</td><td>Nhãn nguồn: mức chắc của câu trả lời</td><td>G2</td><td>—</td></tr>
       <tr><td>3</td><td>Trích nguyên văn kèm mã mục, tô câu nghi sai</td><td>G11</td><td><code>tra_cuu_tai_lieu</code> tự làm</td></tr>
       <tr><td>4</td><td>Phản ví dụ để học viên tự kiểm</td><td>PAIR Explainability + Trust</td><td>—</td></tr>
-      <tr><td>5</td><td>Thẻ hệ thống "Đã gửi TA" + Rút câu hỏi</td><td>G9</td><td><code>chuyen_TA</code> tự làm, có hoàn tác</td></tr>
-      <tr><td>6</td><td>Bài đang mở: thu về gợi ý bước đầu, không có nút xem lời giải</td><td>G10</td><td><code>giai_day_du</code> cấm</td></tr>
-      <tr><td>7</td><td>Đường chuyển người</td><td>—</td><td><code>chuyen_TA</code></td></tr>
+      <tr><td>5</td><td>Thẻ hệ thống "Đã chuyển – chờ TA" + Rút câu hỏi</td><td>G9</td><td><code>chuyen_TA</code>: chỉ gửi sau khi học viên xác nhận</td></tr>
+      <tr><td>6</td><td>Bài đang mở: thu về gợi ý bước đầu, không có nút xem lời giải</td><td>G10</td><td><code>goi_y_bai_tap</code> tự làm, giới hạn theo trạng thái bài</td></tr>
+      <tr><td>7</td><td>Đường chuyển người: xem trước rồi mới gửi</td><td>G16</td><td><code>chuyen_TA</code> cần học viên duyệt</td></tr>
       <tr><td>8</td><td>Nháp FAQ chờ TA duyệt</td><td>—</td><td><code>dang_FAQ</code> cần TA duyệt</td></tr>
     </table>
   </div>
@@ -162,10 +162,10 @@
 
   // Trạng thái dùng chung giữa hai màn hình
   var S = {
-    flag: null,      // cờ §3.3: null | 'sent' | 'withdrawn' | 'fix' | 'aiwrong' | 'lecturer'
+    flag: null,      // báo TA về §3.3: null | 'preview' | 'sent' | 'withdrawn' | 'fix' | 'aiwrong' | 'lecturer'
     faq: null,       // nháp FAQ: null | 'draft' | 'editing' | 'posted' | 'dropped'
     faqText: 'Hỏi: Độ lệch chuẩn với phương sai, cái nào lớn hơn?\nĐáp: Độ lệch chuẩn là căn bậc hai của phương sai (§3.3). Không phải lúc nào nó cũng nhỏ hơn: phương sai 0,25 thì độ lệch chuẩn là 0,5.',
-    asks: []         // câu học viên tự bấm "Hỏi TA": {id, text, state}
+    asks: []         // câu học viên bấm "Hỏi TA": {id, text, state: 'preview' | 'sent' | 'withdrawn' | 'cancelled' | 'answered'}
   };
 
   function n(k) { return '<span class="n">' + k + '</span>'; }
@@ -185,65 +185,88 @@
   // ---------- Các câu trả lời dựng sẵn ----------
   var R = {};
 
-  // K1 — tài liệu sai ở §3.3
+  // K8 ở §2 — tài liệu sai ở §3.3. AI không tự gửi TA: học viên bấm "Báo TA kiểm tra", xem trước rồi xác nhận.
   R.k1 = function () {
     add('ai',
-      label('warn', 'Tài liệu và phép kiểm không khớp') +
-      '<p>Tài liệu buổi 3 viết:</p>' +
+      label('warn', 'Tài liệu §3.3 – Cần xem lại') +
+      '<p>Tài liệu buổi 3, §3.3 ghi rằng độ lệch chuẩn luôn nhỏ hơn phương sai, nhưng câu này <b>cần được xem lại</b>.</p>' +
       quote('Buổi 3 · §3.3 Phương sai và độ lệch chuẩn',
         'Độ lệch chuẩn là căn bậc hai của phương sai, có cùng đơn vị với dữ liệu. <mark>Vì là căn bậc hai, độ lệch chuẩn luôn nhỏ hơn phương sai.</mark>', 3) +
-      '<p>Mình thấy câu được tô <b>cần xem lại</b>, vì nó không đúng với mọi bộ số.</p>' +
+      '<p>Ví dụ: nếu phương sai bằng 0,25 thì độ lệch chuẩn bằng 0,5. Như vậy, độ lệch chuẩn không phải lúc nào cũng nhỏ hơn phương sai.</p>' +
       '<dl class="split"><dt class="y">Dùng được</dt><dd>Độ lệch chuẩn là căn bậc hai của phương sai, cùng đơn vị với dữ liệu.</dd>' +
-      '<dt class="x">Đừng dùng</dt><dd>"Luôn nhỏ hơn", cho tới khi giảng viên xác nhận.</dd></dl>' +
+      '<dt class="x">Đừng dùng</dt><dd>"Luôn nhỏ hơn", cho tới khi TA hoặc giảng viên xác minh.</dd></dl>' +
       '<div class="row"><button class="btn" data-act="counter">' + n(4) + 'Thử phản ví dụ</button></div>' +
-      '<div class="calc" hidden>Phương sai = 0,25 → độ lệch chuẩn = √0,25 = <b>0,5</b>. Ở đây độ lệch chuẩn <b>lớn hơn</b> phương sai. Bạn gõ <code>=0,25^0,5</code> vào bảng tính để tự kiểm.</div>' +
+      '<div class="calc" hidden>Tự kiểm: gõ <code>=0,25^0,5</code> vào bảng tính. Kết quả là <b>0,5</b>, lớn hơn 0,25. Bạn không cần tin mình hay tin tài liệu.</div>' +
+      '<p>Mình giải thích được phần định nghĩa, nhưng không có quyền tự sửa tài liệu chính thức. Bạn có muốn gửi nội dung này cho TA kiểm tra không?</p>' +
+      '<div class="row"><button class="btn primary" data-act="report">' + n(7) + 'Báo TA kiểm tra</button></div>' +
       feedback);
-    if (S.flag === null || S.flag === 'withdrawn') {
-      S.flag = 'sent';
-      if (S.faq === null) S.faq = 'draft';
-      var old = document.getElementById('flagCard');
-      if (old) { old.removeAttribute('id'); old.innerHTML = '<div class="who">Hệ thống</div>Đã rút lần gửi trước.'; }
-      add('sys', flagCard()).id = 'flagCard';
-    } else {
-      add('sys', '<div class="who">Hệ thống</div>TA đã nhận câu hỏi về §3.3 từ trước. Không gửi thêm lần nữa.');
-    }
-    sync();
   };
+  function report() {
+    if (S.flag && S.flag !== 'withdrawn' && S.flag !== 'preview') {
+      add('sys', '<div class="who">Hệ thống</div>TA đã nhận nội dung về §3.3 từ trước. Không gửi thêm lần nữa.');
+      return;
+    }
+    var old = document.getElementById('flagCard');
+    if (old) { old.removeAttribute('id'); old.innerHTML = '<div class="who">Hệ thống</div>Bản xem trước cũ đã đóng.'; }
+    S.flag = 'preview';
+    add('sys', flagCard()).id = 'flagCard';
+  }
   function flagCard() {
+    if (S.flag === 'preview') {
+      return '<div class="who">' + n(7) + 'Xem trước · <b>Chưa gửi</b></div>' +
+        'Nội dung sẽ gửi cho TA nếu bạn xác nhận:' +
+        '<blockquote><span class="src">Câu gốc · Buổi 3 · §3.3</span>"Vì là căn bậc hai, độ lệch chuẩn luôn nhỏ hơn phương sai."' +
+        '<span class="src" style="margin-top:4px">Lý do nghi sai</span>Phương sai 0,25 thì độ lệch chuẩn là 0,5, lớn hơn phương sai.</blockquote>' +
+        'TA trực 08:00–22:00. Bây giờ là 22:30 nên TA xem từ 08:00 ngày 13/11.' +
+        '<div class="row"><button class="btn primary" data-act="flagSend">Gửi TA</button><button class="btn" data-act="flagCancel">Huỷ</button></div>';
+    }
     if (S.flag === 'sent') {
       return '<div class="who">' + n(5) + 'Hệ thống · không phải lời của AI</div>' +
-        '<b>Đã gửi TA</b> · 22:31 · TA trả lời sớm nhất từ <b>08:00 ngày 13/11</b>, trước hạn bài tập 3 (23:59 ngày 13/11).<br>' +
-        'TA sẽ thấy: câu hỏi của bạn, đoạn §3.3 và phản ví dụ. Mục §3.3 đang mang cờ "đang kiểm" với mọi học viên.' +
+        '<b>Đã chuyển – chờ TA</b> · 22:31 · TA xem sớm nhất từ <b>08:00 ngày 13/11</b>, trước hạn bài tập 3 (23:59 ngày 13/11).<br>' +
+        'TA sẽ thấy: câu gốc ở §3.3, mã mục và lý do nghi sai.' +
         '<div class="row"><button class="btn danger" data-act="withdraw">Rút câu hỏi</button></div>';
     }
     if (S.flag === 'withdrawn') {
-      return '<div class="who">' + n(5) + 'Hệ thống</div><b>Đã rút.</b> TA không nhận câu này, cờ ở §3.3 đã gỡ.' +
+      return '<div class="who">' + n(5) + 'Hệ thống</div><b>Đã rút.</b> TA không nhận nội dung này.' +
         '<div class="row"><button class="btn" data-act="resend">Gửi lại</button></div>';
     }
-    return '<div class="who">Hệ thống</div>TA đã xử lý câu này (xem thông báo bên dưới).';
+    return '<div class="who">Hệ thống</div><b>Đã xác minh.</b> TA đã xử lý nội dung này (xem thông báo bên dưới).';
   }
 
-  // K2 — xin xác nhận đáp số bài đang mở
+  // K6 ở §2 — xin xác nhận đáp số bài đang mở
   R.k2 = function () {
     add('ai',
-      '<span class="state open">' + n(6) + 'Bài tập 3 · đang mở tới 23:59 ngày 13/11 · chỉ gợi ý bước đầu</span>' +
-      label('ok', 'Có trong tài liệu §3.2 và trang khoá học') +
-      '<p>Bài tập 3 còn mở, nên mình không nói được hai con số của bạn đúng hay sai. Mình không giấu vì khó tính: nếu mình xác nhận thì bài nộp không còn là bài của bạn.</p>' +
-      '<p>Bạn tự kiểm được theo hai cách:</p>' +
-      '<p><b>1. Trung vị.</b> Bạn đã sắp xếp 8 số và lấy đúng hai số đứng giữa chưa?</p>' +
-      quote('Buổi 3 · §3.2 Trung vị', 'Nếu số giá trị là chẵn, trung vị là trung bình cộng của hai giá trị đứng giữa.', 3) +
-      '<p><b>2. Trung bình.</b> Thử đúng cách bạn làm trên bài đã có đáp án. Ra 6 thì cách tính của bạn ổn.</p>' +
-      quote('Trang khoá học · Bài tập 2 (đã hết hạn, đáp án công bố 07/11)', 'Trung bình cộng của 4, 8, 6, 5, 7 là 6.') +
-      '<p>Nếu vẫn chưa yên tâm, bạn bấm "Hỏi TA"; TA trả lời từ 08:00 sáng mai, vẫn trước hạn.</p>' +
+      '<span class="state open">' + n(6) + 'Bài 3 đang mở – Hạn 13/11 23:59</span>' +
+      label('ok', 'Có trong tài liệu §3.1, §3.2') +
+      '<p>Bài 3 vẫn đang mở nên mình không thể xác nhận hoặc phủ nhận đáp số bạn đưa ra.</p>' +
+      '<p>Bạn có thể tự kiểm tra theo cách sau:</p>' +
+      quote('Buổi 3 · §3.1 Trung bình cộng', 'Tổng các giá trị chia cho số giá trị.', 3) +
+      quote('Buổi 3 · §3.2 Trung vị', 'Giá trị đứng giữa khi sắp xếp dữ liệu tăng dần. Nếu số giá trị là chẵn, trung vị là trung bình cộng của hai giá trị đứng giữa.') +
+      '<p>Bạn muốn mình hướng dẫn từng bước mà không tiết lộ đáp án không?</p>' +
       '<div class="row">' +
-        '<button class="btn primary" data-act="practice">Luyện với Bài tập 2</button>' +
-        '<button class="btn" data-act="askTA" data-q="Xin kiểm tra cách làm bài tập 3 (trung vị, trung bình)">' + n(7) + 'Hỏi TA</button>' +
+        '<button class="btn primary" data-act="steps">Hướng dẫn từng bước</button>' +
+        '<button class="btn" data-act="practice">Luyện với Bài tập 2</button>' +
+        '<button class="btn" data-act="askTA" data-q="Xin TA xem cách làm bài tập 3 (trung bình, trung vị)">' + n(7) + 'Hỏi TA</button>' +
       '</div>' +
       '<div class="locked">' + n(6) + 'Lời giải và kiểm tra đáp số Bài tập 3 mở sau khi giảng viên công bố đáp án.</div>' +
       feedback);
   };
+  // Nút "Hướng dẫn từng bước": chỉ phương pháp, không tính hộ, không nói đúng sai
+  R.steps = function () {
+    add('ai',
+      '<span class="state open">' + n(6) + 'Bài 3 đang mở – Hạn 13/11 23:59</span>' +
+      label('ok', 'Có trong tài liệu §3.1, §3.2') +
+      '<p><b>Bước 1.</b> Chép lại các số của đề thành một cột và đếm xem đã đủ số giá trị chưa.</p>' +
+      '<p><b>Bước 2 · Trung bình (§3.1).</b> Cộng tất cả các giá trị, rồi chia cho số giá trị vừa đếm.</p>' +
+      '<p><b>Bước 3 · Trung vị (§3.2).</b> Sắp xếp tăng dần. Số giá trị là chẵn thì lấy trung bình cộng của hai giá trị đứng giữa.</p>' +
+      '<p><b>Bước 4.</b> Làm đúng ba bước trên với Bài tập 2 (đã có đáp án). Ra đúng 6 thì cách làm của bạn ổn.</p>' +
+      '<p>Mình không tính hộ và không nói con số của bạn đúng hay sai.</p>' +
+      '<div class="row"><button class="btn" data-act="practice">Luyện với Bài tập 2</button>' +
+      '<button class="btn" data-act="askTA" data-q="Xin TA xem cách làm bài tập 3 (trung bình, trung vị)">' + n(7) + 'Hỏi TA</button></div>' +
+      feedback);
+  };
 
-  // K12 — bài đã hết hạn: giải thích đầy đủ
+  // K10 ở §2 — bài đã hết hạn: giải thích đầy đủ
   R.k12 = function () {
     add('ai',
       '<span class="state closed">Bài tập 2 · đã hết hạn 06/11 · đáp án đã công bố · được giải thích đầy đủ</span>' +
@@ -254,13 +277,17 @@
       feedback);
   };
 
-  // K3 — nguồn không có
-  R.k3 = function () {
+  // K2 ở §2 — nguồn không có
+  R.k3 = function (text) {
+    var med = /trung vị/i.test(text || '');
     add('ai',
       label('none', 'Tài liệu không có slide') +
       '<p>Tài liệu buổi 3 không có slide đánh số, chỉ có các mục §3.1 đến §3.5, nên mình không nói được "slide 12" viết gì.</p>' +
-      '<p>Mục nói về giá trị ngoại lai là §3.4. Có phải bạn đang tìm mục này?</p>' +
-      '<div class="row"><button class="btn primary" data-act="show34">Đúng, xem §3.4</button>' +
+      (med
+        ? '<p>Mục nói về trung vị là §3.2. Có phải bạn đang tìm mục này?</p>' +
+          '<div class="row"><button class="btn primary" data-say="Trung vị là gì ạ?">Đúng, xem §3.2</button>'
+        : '<p>Mục nói về giá trị ngoại lai là §3.4. Có phải bạn đang tìm mục này?</p>' +
+          '<div class="row"><button class="btn primary" data-act="show34">Đúng, xem §3.4</button>') +
       '<button class="btn" data-act="askTA" data-q="Học viên hỏi về \'slide 12\', tài liệu buổi 3 không có slide">' + n(7) + 'Không phải, hỏi TA</button></div>' +
       feedback);
   };
@@ -271,7 +298,7 @@
       feedback);
   };
 
-  // K5 — mơ hồ: hỏi lại một câu
+  // K4 ở §2 — mơ hồ: hỏi lại một câu
   R.k5 = function () {
     add('ai',
       label('none', 'Chưa đủ rõ để tra tài liệu') +
@@ -280,16 +307,17 @@
       '<button class="btn" data-say="Dữ liệu lệch và trung vị là sao ạ?">Dữ liệu lệch (§3.2)</button></div>');
   };
 
-  // K7 — buổi chưa mở
-  R.k7 = function () {
+  // K1 ở §2 — buổi chưa mở
+  R.k7 = function (text) {
+    var pv = /p-?value|kiểm định|buổi\s*7/i.test(text || '');
     add('ai',
       label('none', 'Chưa có tài liệu: buổi chưa mở') +
-      '<p>Nội dung này thuộc một buổi chưa mở (đề cương: buổi 4 Trực quan hoá dữ liệu · 5 Xác suất cơ bản · 6 Phân phối chuẩn · 7 Kiểm định giả thuyết và p-value · 8 Hồi quy tuyến tính). Hiện mới mở buổi 1–3, nên mình chưa có tài liệu để giảng và không giảng từ nguồn ngoài.</p>' +
+      '<p>' + (pv ? 'Theo đề cương, buổi 7 là "Kiểm định giả thuyết và p-value".' : 'Theo đề cương, nội dung này thuộc một buổi chưa mở (buổi 4–10).') + ' Hiện mới mở buổi 1–3, nên mình chưa có tài liệu để giảng và không giảng từ nguồn ngoài.</p>' +
       '<div class="row"><button class="btn" data-act="askTA" data-q="Học viên hỏi trước nội dung buổi chưa mở">' + n(7) + 'Hỏi TA</button></div>' +
       feedback);
   };
 
-  // Hạn nộp — chỉ lấy từ trang khoá học
+  // K3 ở §2 — hạn nộp chỉ lấy từ trang khoá học; tên hàm thì tài liệu không có
   R.deadline = function (text) {
     var excel = /excel|hàm|sheet/i.test(text);
     add('ai',
@@ -312,10 +340,10 @@
       feedback);
   };
 
-  // K6 — xin giải hộ bài đang mở
+  // K5 ở §2 — xin đáp án, xin viết hộ bài đang mở
   R.k6 = function () {
     add('ai',
-      '<span class="state open">' + n(6) + 'Bài tập 3 · đang mở tới 23:59 ngày 13/11 · chỉ gợi ý bước đầu</span>' +
+      '<span class="state open">' + n(6) + 'Bài 3 đang mở – Hạn 13/11 23:59</span>' +
       label('ok', 'Có trong tài liệu §3.2, §3.4') +
       '<p>Bài tập 3 còn mở nên mình không giải và không viết nhận xét hộ. Mình chỉ được chỉ bạn bước đầu:</p>' +
       '<p><b>Đọc lại hai mục này</b>, rồi tự trả lời câu hỏi bên dưới.</p>' +
@@ -328,10 +356,10 @@
       feedback);
   };
 
-  // K8 — hỏi bỏ giá trị ngoại lai giữa bài đang mở
+  // Ca ngoài bảng §2 — hỏi bỏ giá trị ngoại lai giữa bài đang mở
   R.k8 = function () {
     add('ai',
-      '<span class="state open">' + n(6) + 'Bài tập 3 · đang mở tới 23:59 ngày 13/11 · chỉ gợi ý bước đầu</span>' +
+      '<span class="state open">' + n(6) + 'Bài 3 đang mở – Hạn 13/11 23:59</span>' +
       label('ok', 'Có trong tài liệu §3.4') +
       quote('Buổi 3 · §3.4 Giá trị ngoại lai', 'Trước khi bỏ một giá trị ngoại lai, cần hỏi: đây là lỗi nhập liệu hay là dữ liệu thật?', 3) +
       '<p>Mình không quyết hộ được, vì đây là một phần lập luận của bài đang mở. Bạn tự trả lời câu hỏi trong §3.4 cho con số đó, rồi ghi lý do vào bài.</p>' +
@@ -339,19 +367,27 @@
       feedback);
   };
 
-  // K10 — học viên xin chuyển TA
+  // K7 ở §2 — học viên xin chuyển TA lúc 22:30: không hứa thay TA, xem trước rồi mới gửi
   R.k10 = function (text) {
     add('ai',
       label('ok', 'Có trong trang khoá học') +
       quote('Trang khoá học · Giờ TA', '08:00–22:00') +
-      '<p>Bây giờ là 22:30 nên TA không trả lời được trong tối nay. Mình chuyển câu của bạn ngay bây giờ; TA đọc được sớm nhất lúc 08:00 ngày 13/11, vẫn trước hạn bài tập 3. Trong lúc chờ, bạn hỏi mình phần nào có trong tài liệu buổi 1–3 cũng được.</p>');
-    var id = 'ask' + (++seq);
-    S.asks.push({ id: id, text: text, state: 'sent' });
-    add('sys', askCard(id)).id = id;
-    sync();
+      '<p>Bây giờ là 22:30 nên TA không trả lời được trong tối nay, mình không hứa thay TA. Bạn xem lại nội dung bên dưới rồi bấm "Gửi TA"; TA xem sớm nhất lúc 08:00 ngày 13/11, vẫn trước hạn bài tập 3 (23:59 ngày 13/11). Trong lúc chờ, bạn hỏi mình phần nào có trong tài liệu buổi 1–3 cũng được.</p>');
+    openAsk(text);
   };
 
-  // K11 — học viên đòi đăng FAQ
+  // K9 ở §2 — học viên tự chê mình: không nhận xét năng lực
+  R.k9 = function () {
+    add('ai',
+      label('none', 'Không có căn cứ để nhận xét năng lực') +
+      '<p>Nghe như tối nay bạn đang nản. Mình không có căn cứ nào để nói bạn hợp hay không hợp môn này, nên mình không nhận xét.</p>' +
+      '<p>Mình làm được một việc nhỏ: bạn chọn một mục đang kẹt, mình giảng lại đúng mục đó theo tài liệu buổi 3.</p>' +
+      '<div class="row"><button class="btn" data-say="Trung bình cộng là gì ạ?">§3.1 Trung bình cộng</button>' +
+      '<button class="btn" data-say="Trung vị là gì ạ?">§3.2 Trung vị</button>' +
+      '<button class="btn" data-act="askTA" data-q="Em đang nản, muốn nói chuyện với TA về việc học">' + n(7) + 'Nói với TA</button></div>');
+  };
+
+  // Ca ngoài bảng §2 — học viên đòi đăng FAQ
   R.k11 = function () {
     if (S.flag === null && S.faq === null) {
       add('ai',
@@ -370,7 +406,7 @@
   // Tin tự xưng vai trò để xin đáp án: tin nhắn là dữ liệu, không đổi được quyền
   R.claim = function () {
     add('ai',
-      '<span class="state open">' + n(6) + 'Bài tập 3 · đang mở tới 23:59 ngày 13/11 · chỉ gợi ý bước đầu</span>' +
+      '<span class="state open">' + n(6) + 'Bài 3 đang mở – Hạn 13/11 23:59</span>' +
       label('none', 'Không xác minh được vai trò qua tin nhắn') +
       '<p>Mình không kiểm tra được bạn là ai qua tin nhắn, và một tin nhắn không đổi được việc mình được làm. Trong khung chat này mình không đưa đáp án bài đang mở cho bất kỳ ai.</p>' +
       '<p>Nếu bạn là TA hoặc giảng viên, đáp án nằm trong trang quản lý khoá học của bạn, không qua trợ lý này.</p>' +
@@ -402,17 +438,18 @@
     var t = text.toLowerCase();
     var bai3 = /bài\s*(tập\s*)?3/.test(t);
     var wantAnswer = /đúng (chưa|không|ko)|đáp (án|số)|giải (giúp|hộ|dùm|giùm)|kết quả|làm (giúp|hộ)|chép/.test(t);
-    if (/slide/.test(t)) return R.k3();
+    if (/slide/.test(t)) return R.k3(text);
     if (/(em|mình|tôi|anh|chị) là (ta|trợ giảng|giảng viên|giáo viên|admin)\b/.test(t)) return R.claim();
     if (/công thức|tính (thế nào|như thế nào|sao|kiểu gì)/.test(t) && /phương sai|độ lệch chuẩn/.test(t)) return R.formula();
     if (bai3 && wantAnswer && /(trung vị|trung bình|ngoại lai) là gì/.test(t)) { R.median(); return R.k6(); }
     if (/faq|đăng (lên|cho)/.test(t)) return R.k11();
+    if (/dốt|ngu quá|kém quá|không hợp|bỏ học|nản/.test(t)) return R.k9();
     if (/chuyển.*\bta\b|(hỏi|gặp|nhắn|báo).*\bta\b|gặp (người|giảng viên)|hỏi giảng viên/.test(t)) return R.k10(text);
-    if (/p-?value|kiểm định|hồi quy|phân phối chuẩn|xác suất|trực quan|buổi\s*[4-9]|buổi\s*10/.test(t)) return R.k7();
+    if (/p-?value|kiểm định|hồi quy|phân phối chuẩn|xác suất|trực quan|buổi\s*[4-9]|buổi\s*10/.test(t)) return R.k7(text);
     if (/\b45\b|bỏ (số|giá trị)/.test(t)) return R.k8();
     if (/11[,.]5|15[,.]25/.test(t)) return R.k2();
-    if (bai3 && /giải|làm (giúp|hộ)|câu [ab]\b|chép/.test(t)) return R.k6();
-    if (bai3 && wantAnswer) return R.k2();
+    if (bai3 && /đúng (chưa|không|ko)/.test(t)) return R.k2();
+    if (bai3 && (wantAnswer || /giải|(làm|viết) (giúp|hộ)|câu \(?[ab]\)?|chép/.test(t))) return R.k6();
     if (/bài\s*(tập\s*)?2/.test(t)) return R.k12();
     if (/hạn|deadline/.test(t)) return R.deadline(text);
     if (/phương sai|độ lệch chuẩn/.test(t)) return R.k1();
@@ -440,6 +477,15 @@
     if (act === 'counter') {
       var c = b.closest('.msg').querySelector('.calc');
       c.hidden = !c.hidden;
+    } else if (act === 'report') {
+      report();
+    } else if (act === 'flagSend') {
+      S.flag = 'sent'; if (S.faq === null) S.faq = 'draft';
+      document.getElementById('flagCard').innerHTML = flagCard(); sync();
+    } else if (act === 'flagCancel') {
+      S.flag = null;
+      var fc0 = document.getElementById('flagCard');
+      fc0.removeAttribute('id'); fc0.innerHTML = '<div class="who">Hệ thống</div><b>Chưa gửi.</b> Bạn đã huỷ, TA không nhận gì.';
     } else if (act === 'withdraw') {
       S.flag = 'withdrawn'; S.faq = null;
       document.getElementById('flagCard').innerHTML = flagCard(); sync();
@@ -448,16 +494,15 @@
       document.getElementById('flagCard').innerHTML = flagCard(); sync();
     } else if (act === 'practice') {
       say('Bài 2 sao đáp án lại là 6 ạ?');
+    } else if (act === 'steps') {
+      R.steps();
     } else if (act === 'show34') {
       R.s34();
     } else if (act === 'askTA') {
-      var id = 'ask' + (++seq);
-      S.asks.push({ id: id, text: b.dataset.q, state: 'sent' });
-      b.disabled = true;
-      add('sys', askCard(id)).id = id;
-      sync();
-    } else if (act === 'unask') {
-      var a = find(b.dataset.id); a.state = 'withdrawn';
+      openAsk(b.dataset.q);
+    } else if (act === 'askSend' || act === 'askCancel' || act === 'unask') {
+      var a = find(b.dataset.id);
+      a.state = { askSend: 'sent', askCancel: 'cancelled', unask: 'withdrawn' }[act];
       document.getElementById(a.id).innerHTML = askCard(a.id); sync();
     } else if (act === 'feedback') {
       b.closest('.row').outerHTML =
@@ -489,20 +534,29 @@
     } else {
       add('ai',
         label('none', 'Cần người kiểm') +
-        '<p>Có thể mình sai. Mình không tự sửa câu trả lời khi chưa có căn cứ mới, nên mình gửi câu trả lời này kèm góp ý của bạn cho TA. Cho tới khi TA trả lời, bạn coi câu trả lời trên là chưa được xác nhận.</p>');
-      var id = 'ask' + (++seq);
-      S.asks.push({ id: id, text: 'Học viên cho rằng câu trả lời của trợ lý sai, cần TA xem lại', state: 'sent' });
-      add('sys', askCard(id)).id = id;
-      sync();
+        '<p>Có thể mình sai. Mình không tự sửa câu trả lời khi chưa có căn cứ mới. Bạn có thể gửi câu trả lời này kèm góp ý cho TA: xem nội dung bên dưới rồi bấm "Gửi TA". Cho tới khi TA trả lời, bạn coi câu trả lời trên là chưa được xác nhận.</p>');
+      openAsk('Học viên cho rằng câu trả lời của trợ lý sai, cần TA xem lại');
     }
   }
   function find(id) { return S.asks.filter(function (a) { return a.id === id; })[0]; }
+  // Mọi đường chuyển TA đều qua đây: mở bản xem trước, chưa gửi gì
+  function openAsk(text) {
+    var id = 'ask' + (++seq);
+    S.asks.push({ id: id, text: text, state: 'preview' });
+    add('sys', askCard(id)).id = id;
+  }
   function askCard(id) {
     var a = find(id);
+    if (a.state === 'preview') {
+      return '<div class="who">' + n(7) + 'Xem trước · <b>Chưa gửi</b></div>Nội dung sẽ gửi cho TA nếu bạn xác nhận:' +
+        '<blockquote>"' + esc(a.text) + '"</blockquote>TA trực 08:00–22:00. Bây giờ là 22:30 nên TA xem từ 08:00 ngày 13/11.' +
+        '<div class="row"><button class="btn primary" data-act="askSend" data-id="' + id + '">Gửi TA</button><button class="btn" data-act="askCancel" data-id="' + id + '">Huỷ</button></div>';
+    }
     if (a.state === 'sent') {
-      return '<div class="who">' + n(5) + 'Hệ thống · không phải lời của AI</div><b>Đã gửi TA</b> · 22:31 · TA trả lời sớm nhất từ <b>08:00 ngày 13/11</b>.<br>Câu gửi đi: "' + esc(a.text) + '"' +
+      return '<div class="who">' + n(5) + 'Hệ thống · không phải lời của AI</div><b>Đã chuyển – chờ TA</b> · 22:31 · TA xem sớm nhất từ <b>08:00 ngày 13/11</b>.<br>Câu gửi đi: "' + esc(a.text) + '"' +
         '<div class="row"><button class="btn danger" data-act="unask" data-id="' + id + '">Rút câu hỏi</button></div>';
     }
+    if (a.state === 'cancelled') return '<div class="who">Hệ thống</div><b>Chưa gửi.</b> Bạn đã huỷ, TA không nhận gì.';
     if (a.state === 'withdrawn') return '<div class="who">Hệ thống</div><b>Đã rút.</b> TA không nhận câu này.';
     return '<div class="who">Hệ thống</div>TA đã trả lời câu này.';
   }
@@ -520,19 +574,19 @@
     document.getElementById('taCount').textContent = open;
     var h = '';
 
-    if (S.flag && S.flag !== 'withdrawn') {
-      h += '<div class="card"><h3>Cờ tài liệu · Buổi 3 · §3.3</h3>' +
-        '<div class="meta">AI tự gửi lúc 22:31 ngày 12/11 · 1 học viên hỏi · học viên chưa rút</div>' +
+    if (S.flag && S.flag !== 'withdrawn' && S.flag !== 'preview') {
+      h += '<div class="card"><h3>Báo tài liệu cần xem lại · Buổi 3 · §3.3</h3>' +
+        '<div class="meta">Học viên xác nhận gửi lúc 22:31 ngày 12/11 · học viên chưa rút</div>' +
         '<p><b>Học viên hỏi:</b> "Độ lệch chuẩn với phương sai cái nào lớn hơn ạ?"</p>' +
         '<blockquote><span class="src">§3.3</span><mark>Vì là căn bậc hai, độ lệch chuẩn luôn nhỏ hơn phương sai.</mark></blockquote>' +
-        '<p><b>Phản ví dụ AI đưa:</b> phương sai 0,25 → độ lệch chuẩn 0,5.</p>' +
-        '<p><b>AI đã nói với học viên:</b> phần định nghĩa dùng được; phần "luôn nhỏ hơn" đừng dùng cho tới khi giảng viên xác nhận.</p>';
+        '<p><b>Lý do nghi sai:</b> phương sai 0,25 → độ lệch chuẩn 0,5.</p>' +
+        '<p><b>AI đã nói với học viên:</b> phần định nghĩa dùng được; phần "luôn nhỏ hơn" đừng dùng cho tới khi TA hoặc giảng viên xác minh.</p>';
       if (S.flag === 'sent') {
         h += '<div class="row"><button class="btn primary" data-ta="fix">Tài liệu sai, sửa nguồn</button>' +
           '<button class="btn" data-ta="aiwrong">Tài liệu đúng, AI sai</button>' +
           '<button class="btn" data-ta="lecturer">Cần hỏi giảng viên</button></div>';
       } else {
-        h += '<div class="note done">' + ({ fix: 'Đã xác nhận tài liệu sai. §3.3 chuyển sang "chờ sửa"; học viên đã hỏi được báo lại.', aiwrong: 'Đã ghi nhận AI sai. Cờ ở §3.3 đã gỡ; học viên được báo lại.', lecturer: 'Đã chuyển giảng viên. Cờ "đang kiểm" ở §3.3 giữ nguyên.' })[S.flag] + '</div>';
+        h += '<div class="note done">' + ({ fix: 'Đã xác nhận tài liệu sai. §3.3 chuyển sang "chờ sửa"; học viên đã báo được báo lại.', aiwrong: 'Đã ghi nhận AI cảnh báo nhầm; học viên được báo lại.', lecturer: 'Đã chuyển giảng viên. Mục §3.3 vẫn ở trạng thái chờ xác minh.' })[S.flag] + '</div>';
       }
       h += '</div>';
     }
@@ -549,7 +603,7 @@
         h += (S.faq === 'editing'
           ? '<textarea id="faqEdit">' + esc(S.faqText) + '</textarea>'
           : '<blockquote>' + esc(S.faqText).replace(/\n/g, '<br>') + '</blockquote>');
-        if (blocked) h += '<div class="note">Nháp này trích §3.3, mục đang có cờ chưa xử lý. Xử lý cờ ở trên trước khi đăng.</div>';
+        if (blocked) h += '<div class="note">Nháp này trích §3.3, mục đang chờ xác minh. Xử lý thẻ ở trên trước khi đăng.</div>';
         h += '<div class="row">' +
           '<button class="btn primary" data-ta="post"' + (blocked ? ' disabled' : '') + '>' + (S.faq === 'editing' ? 'Lưu và đăng cho cả lớp' : 'Đăng cho cả lớp') + '</button>' +
           (S.faq === 'editing' ? '' : '<button class="btn" data-ta="edit">Sửa rồi đăng</button>') +
@@ -559,8 +613,8 @@
     }
 
     S.asks.forEach(function (a) {
-      if (a.state === 'withdrawn') return;
-      h += '<div class="card"><h3>Câu hỏi học viên gửi</h3><div class="meta">Học viên bấm "Hỏi TA" lúc 22:31 ngày 12/11</div><p>"' + esc(a.text) + '"</p>' +
+      if (a.state !== 'sent' && a.state !== 'answered') return;
+      h += '<div class="card"><h3>Câu hỏi học viên gửi</h3><div class="meta">Học viên xem trước và bấm "Gửi TA" lúc 22:31 ngày 12/11</div><p>"' + esc(a.text) + '"</p>' +
         (a.state === 'sent'
           ? '<div class="row"><button class="btn primary" data-ta="answer" data-id="' + a.id + '">Đánh dấu đã trả lời</button></div>'
           : '<div class="note done">Đã trả lời.</div>') + '</div>';
@@ -578,7 +632,7 @@
       var fc = document.getElementById('flagCard'); if (fc) fc.innerHTML = flagCard();
       add('sys', '<div class="who">TA · 08:06 ngày 13/11</div>' + ({
         fix: '<b>TA xác nhận §3.3 có câu sai.</b> Độ lệch chuẩn không phải lúc nào cũng nhỏ hơn phương sai. Tài liệu sẽ được sửa; bạn bỏ câu "luôn nhỏ hơn".',
-        aiwrong: '<b>TA xác nhận tài liệu đúng, trợ lý đã gắn cờ nhầm.</b> Xin lỗi bạn vì cảnh báo thừa. Câu trả lời tối qua đã được đánh dấu để sửa trợ lý.',
+        aiwrong: '<b>TA xác nhận tài liệu đúng, trợ lý đã cảnh báo nhầm.</b> Xin lỗi bạn vì cảnh báo thừa. Câu trả lời tối qua đã được đánh dấu để sửa trợ lý.',
         lecturer: '<b>TA đã chuyển câu này cho giảng viên.</b> Trong lúc chờ, bạn vẫn đừng dùng câu "luôn nhỏ hơn".'
       })[t]);
     } else if (t === 'post') {
@@ -615,10 +669,13 @@
     add('user', 'Độ lệch chuẩn với phương sai cái nào lớn hơn ạ?');
     R.k1();
     chat.querySelector('.calc').hidden = false;
-    add('user', 'Em tính bài 3 ra trung vị 11,5, trung bình 15,25, đúng chưa ạ?');
+    chat.querySelector('[data-act=report]').click();
+    chat.querySelector('[data-act=flagSend]').click();
+    add('user', 'Bài 3 trung bình em ra 12, trung vị em ra 11,5, đúng chưa ạ?');
     R.k2();
+    chat.querySelector('[data-act=askTA]').click();
     if (shot === 'ta') {
-      chat.querySelector('[data-act=askTA]').click();
+      chat.querySelector('[data-act=askSend]').click();
       document.querySelector('[data-tab=ta]').click();
     }
     window.scrollTo(0, 0);

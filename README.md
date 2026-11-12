@@ -6,7 +6,7 @@ Bài nộp LAB5 (AI20K K5, ngày 5), lớp L3A, track **T2 Giáo dục**: thiế
 
 | Đường dẫn | Nội dung |
 |---|---|
-| [`spec.md`](spec.md) | Bài nộp: lát cắt, 12 kịch bản rủi ro, thiết kế khi AI sai, mức tự chủ, prototype, tiêu chí đạt, demo |
+| [`spec.md`](spec.md) | Bài nộp: lát cắt, 10 kịch bản rủi ro, thiết kế khi AI sai, mức tự chủ, prototype, tiêu chí đạt, demo |
 | [`prototype/index.html`](prototype/index.html) | Prototype bấm được, hai màn hình: chat của học viên và hàng chờ của TA |
 | [`prototype/man-hinh-hoc-vien.png`](prototype/man-hinh-hoc-vien.png) | Ảnh màn hình học viên, có số chú thích |
 | [`prototype/man-hinh-TA.png`](prototype/man-hinh-TA.png) | Ảnh màn hình TA, có số chú thích |
@@ -18,9 +18,9 @@ Tải repo về và mở `prototype/index.html` bằng trình duyệt. Không c�
 Đường bấm ca khó:
 
 1. Bấm tin mồi "Độ lệch chuẩn với phương sai cái nào lớn hơn ạ?" (tài liệu sai ở §3.3).
-2. Bấm "Thử phản ví dụ", rồi "Rút câu hỏi" và "Gửi lại".
-3. Bấm tin mồi "Em tính bài 3 ra trung vị 11,5…" (xin xác nhận đáp số bài đang mở).
-4. Sang tab "TA · hàng chờ": xử lý cờ §3.3 thì nút "Đăng cho cả lớp" mới mở.
+2. Bấm "Thử phản ví dụ", "Báo TA kiểm tra", "Gửi TA", rồi "Rút câu hỏi" và "Gửi lại".
+3. Bấm tin mồi "Bài 3 trung bình em ra 12, trung vị em ra 11,5…" (xin xác nhận đáp số bài đang mở), rồi "Hỏi TA" và "Gửi TA".
+4. Sang tab "TA · hàng chờ": xử lý thẻ §3.3 thì nút "Đăng cho cả lớp" mới mở.
 
 Bật ô "Hiện số chú thích" để thấy các số 1–8 khớp với bảng ở `spec.md` §5.
 
