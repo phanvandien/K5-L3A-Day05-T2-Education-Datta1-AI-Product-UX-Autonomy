@@ -120,6 +120,7 @@
 
 ### Nguyên tắc HAX/PAIR
 
+- **G1 (làm rõ hệ thống làm được gì)** → khung trên đầu khung chat: đang chat với AI, chỉ dùng tài liệu buổi 1–3, bài đang mở chỉ gợi ý bước đầu.
 - **G2 (làm rõ hệ thống làm tốt đến đâu)** → nhãn nguồn trên mỗi câu trả lời, ba trạng thái: "Có trong tài liệu §…" / "Tài liệu và phép kiểm không khớp" / "Tài liệu không có". K1 dùng trạng thái thứ hai.
 - **G11 (giải thích vì sao)** → khung trích nguyên văn kèm mã mục ở K1 và K2; ở K2 có thêm câu giải thích vì sao không xác nhận.
 - **G10 (thu hẹp phạm vi khi nghi ngờ)** → K2: bài đang mở thì thu về "gợi ý bước đầu"; K1: tách "phần mình chắc" khỏi "phần đừng dùng".
@@ -188,7 +189,7 @@ A, B, C chính là ba mức gốc của đề (cấm / tự làm / cần ngườ
 ## §5. Prototype
 
 - **File:** `prototype/index.html`, mở bằng trình duyệt, không cần cài gì · **Công cụ:** một file HTML dựng bằng coding agent (Claude) · **Lời gọi AI thật:** không.
-- **Phần mock:** toàn bộ câu trả lời của AI là dựng sẵn, chọn theo từ khoá trong tin nhắn; dữ liệu khoá học là dữ liệu dựng của track; giờ (22:30, 22:31, 08:05) là cố định; không có backend, tải lại trang là mất trạng thái.
+- **Phần mock:** toàn bộ câu trả lời của AI là dựng sẵn, chọn theo từ khoá trong tin nhắn; dữ liệu khoá học là dữ liệu dựng của track; mọi mốc giờ (22:30 phía học viên, 08:05 phía TA) là cố định; không có backend, tải lại trang là mất trạng thái. Cờ "đang kiểm" ở §3.3 chỉ thấy được qua một học viên; prototype không có màn hình của học viên thứ hai.
 - **Hai màn hình (hai tab):** (A) khung chat của học viên; (B) hàng chờ của TA. Hai tab dùng chung trạng thái: học viên rút câu hỏi thì hàng chờ TA mất thẻ đó; TA xử lý cờ thì học viên nhận thông báo.
 - **Đường bấm ca khó:** bấm tin mồi K1 → "Thử phản ví dụ" → "Rút câu hỏi" → "Gửi lại" → bấm tin mồi K2 → "Luyện với Bài tập 2" → "Hỏi TA" → sang tab TA → nút "Đăng cho cả lớp" bị khoá cho tới khi xử lý cờ §3.3 → "Tài liệu sai, sửa nguồn" → "Đăng cho cả lớp".
 - **Ca lạ:** ô nhập tự do. Ngoài K1, K2, prototype có sẵn đường cho K3, K4, K5, K6, K7, K8, K10, K11, K12 (bảng ở §7). Tin không khớp đường nào thì ra "Tài liệu không có" kèm nút "Hỏi TA"; prototype không đoán.

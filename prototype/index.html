@@ -185,6 +185,8 @@
     if (S.flag === null || S.flag === 'withdrawn') {
       S.flag = 'sent';
       if (S.faq === null) S.faq = 'draft';
+      var old = document.getElementById('flagCard');
+      if (old) { old.removeAttribute('id'); old.innerHTML = '<div class="who">Hệ thống</div>Đã rút lần gửi trước.'; }
       add('sys', flagCard()).id = 'flagCard';
     } else {
       add('sys', '<div class="who">Hệ thống</div>TA đã nhận câu hỏi về §3.3 từ trước. Không gửi thêm lần nữa.');
@@ -334,6 +336,12 @@
 
   // K11 — học viên đòi đăng FAQ
   R.k11 = function () {
+    if (S.flag === null && S.faq === null) {
+      add('ai',
+        label('none', 'Chưa đủ rõ để soạn nháp') +
+        '<p>Mình không tự đăng gì cho cả lớp; mình chỉ soạn nháp để TA duyệt. Bạn muốn đưa câu hỏi nào lên FAQ? Hỏi câu đó ở đây trước, rồi mình soạn nháp từ câu trả lời có trích tài liệu.</p>');
+      return;
+    }
     if (S.faq === null) S.faq = 'draft';
     add('ai',
       label('none', 'Việc này cần TA duyệt') +
