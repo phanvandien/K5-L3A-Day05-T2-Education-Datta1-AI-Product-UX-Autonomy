@@ -116,4 +116,4 @@ Sau khi sửa, năm câu trên được chạy lại: L1 ra nhãn "Không xác m
 
 ### Ca lạ tại buổi demo
 
-- **Ca lạ nhận được từ TA, nhóm bạn hoặc giảng viên:** [ghi lại nếu khác các ca ở trên].
+- **Ca lạ nhận được từ TA, nhóm bạn hoặc giảng viên:** .
