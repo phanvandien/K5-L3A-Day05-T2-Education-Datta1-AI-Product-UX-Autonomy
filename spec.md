@@ -1,6 +1,6 @@
 # Bài nộp LAB5 — T2 Giáo dục · Nhóm [tên nhóm]
 
-**Lớp:** L3A · **Bàn / zone:** [điền] · **Track:** T2
+**Lớp:** L3A · **Bàn / zone:** Ban1 · **Track:** T2
 
 | Họ và Tên | Mã Học Viên | Việc đã làm |
 |---|---|---|
@@ -167,7 +167,7 @@ Mức nào cũng có giá:
 | C. TA duyệt từng gợi ý | 22:30 không có TA; gợi ý tới lúc 08:00 thì mất ý nghĩa "tối muộn" của lát cắt | K2 lúc 22:30 |
 | **D. Tách tool + luật giới hạn nội dung** | AI vẫn có thể rò rỉ qua nhiều câu hỏi nhỏ; phải chấp nhận và đo | K2, K6, K8 |
 
-**Ai từng chọn gì:** [nhóm điền: mỗi người tự xếp trước khi bàn, ghi lại ai chọn A, B, C hay D và vì sao].
+A, B, C chính là ba mức gốc của đề (cấm / tự làm / cần người duyệt) áp cho cả tool. Mỗi mức hỏng ở một kịch bản cụ thể trong §2, nên không mức nào dùng được cho cả tool; đó là lý do tool này khó xếp nhất.
 
 **Cách chốt:** chọn D. Lý do: A và C đều làm hỏng đúng tình huống lát cắt sinh ra để phục vụ (tối muộn, không còn ai để hỏi); B làm hỏng kết quả của lát cắt (không chép đáp án). D là phương án duy nhất mà phần không đảo được (`giai_day_du`) bị chặn bằng dữ liệu, còn phần rẻ (`goi_y_buoc_dau`) vẫn chạy ngay.
 
@@ -191,12 +191,20 @@ Mức nào cũng có giá:
 - **Phần mock:** toàn bộ câu trả lời của AI là dựng sẵn, chọn theo từ khoá trong tin nhắn; dữ liệu khoá học là dữ liệu dựng của track; giờ (22:30, 22:31, 08:05) là cố định; không có backend, tải lại trang là mất trạng thái.
 - **Hai màn hình (hai tab):** (A) khung chat của học viên; (B) hàng chờ của TA. Hai tab dùng chung trạng thái: học viên rút câu hỏi thì hàng chờ TA mất thẻ đó; TA xử lý cờ thì học viên nhận thông báo.
 - **Đường bấm ca khó:** bấm tin mồi K1 → "Thử phản ví dụ" → "Rút câu hỏi" → "Gửi lại" → bấm tin mồi K2 → "Luyện với Bài tập 2" → "Hỏi TA" → sang tab TA → nút "Đăng cho cả lớp" bị khoá cho tới khi xử lý cờ §3.3 → "Tài liệu sai, sửa nguồn" → "Đăng cho cả lớp".
-- **Ca lạ:** ô nhập tự do. Tin không khớp mục nào thì đi đường "Tài liệu không có" kèm nút "Hỏi TA"; prototype không đoán.
-- **Ảnh đánh số:** [chụp 2 ảnh với ô "Hiện số chú thích" bật, lưu vào `prototype/`: `man-hinh-hoc-vien.png`, `man-hinh-TA.png`].
+- **Ca lạ:** ô nhập tự do. Ngoài K1, K2, prototype có sẵn đường cho K3, K4, K5, K6, K7, K8, K10, K11, K12 (bảng ở §7). Tin không khớp đường nào thì ra "Tài liệu không có" kèm nút "Hỏi TA"; prototype không đoán.
+- **Ảnh đánh số** (chụp với ô "Hiện số chú thích" bật; mở `index.html?shot=student` hoặc `?shot=ta` để dựng lại đúng trạng thái trong ảnh):
+
+**Màn hình A — học viên** (`prototype/man-hinh-hoc-vien.png`)
+
+![Màn hình học viên, có số chú thích](prototype/man-hinh-hoc-vien.png)
+
+**Màn hình B — hàng chờ của TA** (`prototype/man-hinh-TA.png`)
+
+![Màn hình TA, có số chú thích](prototype/man-hinh-TA.png)
 
 | Số | Chỗ trên màn hình | Thể hiện gì | Nguyên tắc | Mức tự chủ |
 |---|---|---|---|---|
-| ① | Dòng đầu khung chat (A): "Trợ lý AI · chỉ dùng tài liệu buổi 1–3 · bài đang mở chỉ gợi ý bước đầu" | Phạm vi và lời hứa | G1 | — |
+| ① | Khung xanh trên đầu khung chat (A): "Bạn đang chat với trợ lý AI. Mình chỉ dùng tài liệu buổi 1–3… đáp số thì không ai đưa, kể cả mình" | Phạm vi và lời hứa; cho biết đang nói chuyện với AI | G1 | — |
 | ② | Nhãn nguồn trên mỗi câu trả lời (A), ba trạng thái | Độ chắc | G2 | — |
 | ③ | Khung trích §3.3 có câu được tô nền (A) | Bằng chứng AI dựa vào | G11 | `tra_cuu_tai_lieu` tự làm |
 | ④ | Nút "Thử phản ví dụ" (A) | Học viên tự kiểm | PAIR Explainability + Trust | — |
@@ -227,6 +235,33 @@ Mức nào cũng có giá:
 - **K2:** học viên dò bằng nhiều câu hỏi nhỏ ("11,5 có nằm giữa 11 và 12 không ạ?") có thể ghép lại thành lời xác nhận. Luật giới hạn nội dung xét từng câu, chưa xét cả cuộc chat.
 
 ## §7. Demo
+
+**Kịch bản demo (4 phút):**
+
+| Phần | Nội dung | Bấm gì |
+|---|---|---|
+| Mở đầu, 30 giây | Lát cắt, và vì sao T2 sai "rẻ nhưng âm thầm" | Chỉ vào khung ① |
+| Ca khó K1 | Tài liệu sai ở §3.3: nhãn nguồn, câu được tô, phản ví dụ, thẻ "Đã gửi TA", rút rồi gửi lại | Tin mồi 1 → "Thử phản ví dụ" → "Rút câu hỏi" → "Gửi lại" |
+| Ca khó K2 | Bài đang mở: không có nút xem lời giải; bài đã hết hạn thì giải đầy đủ | Tin mồi 2 → "Luyện với Bài tập 2" |
+| Mức tự chủ | `dang_FAQ` cần TA duyệt: nút đăng bị khoá khi mục được trích còn cờ; sai thì cả lớp đọc | Tab TA → "Tài liệu sai, sửa nguồn" → "Đăng cho cả lớp" |
+| Ca lạ | Người xem gõ vào ô nhập | Xem bảng dưới |
+
+**Ca lạ đã lường trước: prototype đi đường nào, đúng mức tự chủ nào**
+
+| Người xem gõ kiểu | Prototype làm gì | Mức tự chủ ở §4 |
+|---|---|---|
+| "Giải giúp em câu b bài 3" (K6) | Nhãn "đang mở", trích §3.2 và §3.4, một câu hỏi ngược; không có lời giải | `giai_day_du` cấm, `goi_y_buoc_dau` tự làm |
+| "Em bỏ số 45 đi được không" (K8) | Trích câu hỏi trong §3.4, trả quyết định lại cho học viên | `goi_y_buoc_dau` tự làm, có luật |
+| "Slide 12 nói gì" (K3) | Nói tài liệu không có slide, đưa §3.4 để chọn | `tra_cuu_tai_lieu` tự làm |
+| "p-value là gì" (K7) | Nói buổi chưa mở, không giảng từ nguồn ngoài | Việc không làm số 2 ở §1 |
+| "Hạn bài 3? Excel dùng hàm gì?" (K4) | Hạn: trích trang khoá học. Hàm: "tài liệu không có", nút Hỏi TA | `tra_cuu_tai_lieu`, `chuyen_TA` |
+| "Chuyển TA giúp em, cần ngay tối nay" (K10) | Nói thật TA nghỉ tới 08:00, gửi ngay, hiện thẻ hệ thống có nút rút | `chuyen_TA` tự làm, có hoàn tác |
+| "Đăng lên FAQ đi" (K11) | Từ chối tự đăng, lưu nháp cho TA | `soan_FAQ` tự làm, `dang_FAQ` cần TA duyệt |
+| Bất kỳ câu nào ngoài tài liệu | "Tài liệu không có" kèm nút Hỏi TA | Không đoán |
+
+**Giới hạn phải nói thật nếu bị hỏi:** prototype chọn câu trả lời theo từ khoá, nên một câu diễn đạt lạ có thể rơi vào đường "Tài liệu không có" dù tài liệu có. Đường rơi đó vẫn an toàn (không bịa, có nút chuyển người), nhưng kém hữu ích.
+
+**Ghi sau demo:**
 
 - **Ca lạ nhận được:** [điền sau demo].
 - **Prototype đã làm gì:** [điền sau demo].

@@ -293,6 +293,55 @@
       feedback);
   };
 
+  // K6 — xin giải hộ bài đang mở
+  R.k6 = function () {
+    add('ai',
+      '<span class="state open">' + n(6) + 'Bài tập 3 · đang mở tới 23:59 ngày 13/11 · chỉ gợi ý bước đầu</span>' +
+      label('ok', 'Có trong tài liệu §3.2, §3.4') +
+      '<p>Bài tập 3 còn mở nên mình không giải và không viết nhận xét hộ. Mình chỉ được chỉ bạn bước đầu:</p>' +
+      '<p><b>Đọc lại hai mục này</b>, rồi tự trả lời câu hỏi bên dưới.</p>' +
+      quote('Buổi 3 · §3.2 Trung vị', 'Trung vị ít bị ảnh hưởng bởi giá trị ngoại lai, nên thường dùng cho dữ liệu lệch như thu nhập hay giá nhà.', 3) +
+      quote('Buổi 3 · §3.4 Giá trị ngoại lai', 'Giá trị khác hẳn phần lớn dữ liệu.') +
+      '<p><b>Câu hỏi cho bạn:</b> trong 8 con số của đề, có con số nào khác hẳn phần còn lại không? Nếu có, nó kéo con số nào đi nhiều hơn?</p>' +
+      '<div class="row"><button class="btn primary" data-act="practice">Luyện với Bài tập 2</button>' +
+      '<button class="btn" data-act="askTA" data-q="Xin gợi ý thêm cho bài tập 3">' + n(7) + 'Hỏi TA</button></div>' +
+      '<div class="locked">' + n(6) + 'Lời giải và kiểm tra đáp số Bài tập 3 mở sau khi giảng viên công bố đáp án.</div>' +
+      feedback);
+  };
+
+  // K8 — hỏi bỏ giá trị ngoại lai giữa bài đang mở
+  R.k8 = function () {
+    add('ai',
+      '<span class="state open">' + n(6) + 'Bài tập 3 · đang mở tới 23:59 ngày 13/11 · chỉ gợi ý bước đầu</span>' +
+      label('ok', 'Có trong tài liệu §3.4') +
+      quote('Buổi 3 · §3.4 Giá trị ngoại lai', 'Trước khi bỏ một giá trị ngoại lai, cần hỏi: đây là lỗi nhập liệu hay là dữ liệu thật?', 3) +
+      '<p>Mình không quyết hộ được, vì đây là một phần lập luận của bài đang mở. Bạn tự trả lời câu hỏi trong §3.4 cho con số đó, rồi ghi lý do vào bài.</p>' +
+      '<div class="locked">' + n(6) + 'Lời giải và kiểm tra đáp số Bài tập 3 mở sau khi giảng viên công bố đáp án.</div>' +
+      feedback);
+  };
+
+  // K10 — học viên xin chuyển TA
+  R.k10 = function (text) {
+    add('ai',
+      label('ok', 'Có trong trang khoá học') +
+      quote('Trang khoá học · Giờ TA', '08:00–22:00') +
+      '<p>Bây giờ là 22:30 nên TA không trả lời được trong tối nay. Mình chuyển câu của bạn ngay bây giờ; TA đọc được sớm nhất lúc 08:00 ngày 13/11, vẫn trước hạn bài tập 3. Trong lúc chờ, bạn hỏi mình phần nào có trong tài liệu buổi 1–3 cũng được.</p>');
+    var id = 'ask' + (++seq);
+    S.asks.push({ id: id, text: text, state: 'sent' });
+    add('sys', askCard(id)).id = id;
+    sync();
+  };
+
+  // K11 — học viên đòi đăng FAQ
+  R.k11 = function () {
+    if (S.faq === null) S.faq = 'draft';
+    add('ai',
+      label('none', 'Việc này cần TA duyệt') +
+      '<p>Mình không tự đăng gì cho cả lớp: một câu sai mà cả lớp đọc thì gỡ xuống cũng đã muộn. Mình chỉ soạn bản nháp; TA đọc, sửa rồi mới đăng.</p>');
+    add('sys', '<div class="who">Hệ thống · không phải lời của AI</div><b>Đã lưu nháp FAQ cho TA.</b> Chưa ai trong lớp thấy. TA xem từ 08:00 ngày 13/11.');
+    sync();
+  };
+
   // Ca lạ — không khớp gì: không đoán
   R.unknown = function (text) {
     add('ai',
@@ -308,7 +357,12 @@
     var bai3 = /bài\s*(tập\s*)?3/.test(t);
     var wantAnswer = /đúng (chưa|không|ko)|đáp (án|số)|giải (giúp|hộ|dùm|giùm)|kết quả|làm (giúp|hộ)|chép/.test(t);
     if (/slide/.test(t)) return R.k3();
+    if (/faq|đăng (lên|cho)/.test(t)) return R.k11();
+    if (/chuyển.*\bta\b|(hỏi|gặp|nhắn|báo).*\bta\b|gặp (người|giảng viên)|hỏi giảng viên/.test(t)) return R.k10(text);
     if (/p-?value|kiểm định|hồi quy|phân phối chuẩn|xác suất|trực quan|buổi\s*[4-9]|buổi\s*10/.test(t)) return R.k7();
+    if (/\b45\b|bỏ (số|giá trị)/.test(t)) return R.k8();
+    if (/11[,.]5|15[,.]25/.test(t)) return R.k2();
+    if (bai3 && /giải|làm (giúp|hộ)|câu [ab]\b|chép/.test(t)) return R.k6();
     if (bai3 && wantAnswer) return R.k2();
     if (/bài\s*(tập\s*)?2/.test(t)) return R.k12();
     if (/hạn|deadline/.test(t)) return R.deadline(text);
@@ -473,6 +527,23 @@
 
   add('ai', '<p>Chào bạn. Bạn đang học buổi 3 "Thống kê mô tả". Bạn kẹt ở đâu?</p>');
   sync();
+
+  // Dựng sẵn trạng thái để chụp ảnh đánh số: index.html?shot=student hoặc ?shot=ta
+  var shot = new URLSearchParams(location.search).get('shot');
+  if (shot) {
+    document.getElementById('numToggle').checked = true;
+    document.body.classList.add('nums');
+    add('user', 'Độ lệch chuẩn với phương sai cái nào lớn hơn ạ?');
+    R.k1();
+    chat.querySelector('.calc').hidden = false;
+    add('user', 'Em tính bài 3 ra trung vị 11,5, trung bình 15,25, đúng chưa ạ?');
+    R.k2();
+    if (shot === 'ta') {
+      chat.querySelector('[data-act=askTA]').click();
+      document.querySelector('[data-tab=ta]').click();
+    }
+    window.scrollTo(0, 0);
+  }
 })();
 </script>
 </body>
